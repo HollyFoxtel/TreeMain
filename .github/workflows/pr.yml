@@ -21,7 +21,7 @@ jobs:
     - name: Configure Git
       run: |
         git config --global user.name 'GitHub Actions Bot'
-        git config --global user.email 'SubtreeBot@github.com'
+        git config --global user.email 'HollyFoxtel@github.com'
 
     - name: Update PR Commit Message
       run: |
