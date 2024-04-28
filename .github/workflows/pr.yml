@@ -1,0 +1,46 @@
+name: Sync Subtree
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+
+  sync-subtree:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout SuperRepo
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config --global user.name 'GitHub Actions Bot'
+        git config --global user.email 'SubtreeBot@github.com'
+
+    - name: Update PR Commit Message
+      run: |
+        git commit --allow-empty --amend -m "${{ github.event.pull_request.title }} (SuperRepo#${{ github.event.pull_request.number }})"
+        git push --force-with-lease
+
+    - name: Sync to SubRepo
+      env:
+        SUBREPO_REMOTE: git@github.com:HollyFoxtel/TreeComponent.git
+        SUBREPO_BRANCH: main
+        SUBREPO_DIR: ComponentA
+      run: |
+        git subtree pull --prefix=$SUBREPO_DIR --squash $SUBREPO_REMOTE $SUBREPO_BRANCH
+        
+        SPLIT_COMMIT=$(git subtree split --prefix=$SUBREPO_DIR --rejoin --squash --annotate="split: $SUBREPO_DIR - ${{ github.event.pull_request.title }} (#${{ github.event.pull_request.number }})")
+        
+        if [ -n "$SPLIT_COMMIT" ]; then
+          git subtree push --prefix=$SUBREPO_DIR $SUBREPO_REMOTE $SUBREPO_BRANCH
+        fi
+
+    - name: Push SuperRepo Changes
+      run: git push
