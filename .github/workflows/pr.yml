@@ -21,11 +21,11 @@ jobs:
       with:
         fetch-depth: 0
 
-     - name: Setup SSH Keys
+    - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: |
-          ${{ secrets.Tree_Key}}
+          ${{ secrets.Tree_Key }}
 
     - name: Configure Git
       run: |
