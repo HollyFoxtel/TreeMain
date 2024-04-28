@@ -24,8 +24,7 @@ jobs:
     - name: Setup SSH Keys
       uses: webfactory/ssh-agent@v0.7.0
       with:
-        ssh-private-key: |
-          ${{ secrets.TREE_KEY }}
+        ssh-private-key: ${{ secrets.TREE_KEY }}
 
     - name: Configure Git
       run: |
